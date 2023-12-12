@@ -2,12 +2,22 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const route = require("./src/route");
+const database = require("./src/db-config");
 
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.set("view engine", "ejs");
+
+database.connect(err => {
+	if (err){
+		console.log(err.message);
+	}
+	else {
+		console.log('Connected');
+	}
+})
 
 app.use(route);
 
