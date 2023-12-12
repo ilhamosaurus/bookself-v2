@@ -10,15 +10,6 @@ app.use(express.json());
 
 app.set("view engine", "ejs");
 
-database.connect(err => {
-	if (err){
-		console.log(err.message);
-	}
-	else {
-		console.log('Connected');
-	}
-})
-
 app.use(route);
 
 const listener = app.listen(process.env.PORT || 3000, async () => {
