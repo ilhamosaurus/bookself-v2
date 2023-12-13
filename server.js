@@ -1,14 +1,21 @@
-const express = require("express");
+const express = require('express');
 const app = express();
-const cors = require("cors");
-const route = require("./src/route");
-const database = require("./src/db-config");
+const cors = require('cors');
+const route = require('./src/route');
+const session = require('express-session');
+const flash = require('express-flash');
 
 app.use(cors());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(express.json());
+app.use(session({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: false,
+}));
+app.use(flash());
 
-app.set("view engine", "ejs");
+app.set('view engine', 'ejs');
 
 app.use(route);
 

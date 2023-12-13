@@ -9,6 +9,11 @@
 </head>
 <body>
   <h1>Login</h1>
+  <ul>
+    <% if (messages.success_msg) { %>
+    <li><%= messages.success_msg %></li>
+  <% } %>
+  </ul>
   <form action="/login" method="POST">
     <div>  
       <input type="email" id="email" name="email" placeholder="Your email" required />
