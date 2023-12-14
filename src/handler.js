@@ -103,6 +103,73 @@ const postReg = async (req, res) => {
   }
 };
 
+const postBook = (req, res) => {
+  const {title, year, summary, publisher, pageCount, pageRead} = req.body;
+  const email = req.user.email;
+  const user = req.user.name;
+  const insertedAt = new Date().toISOString();
+  const reading = false;
+  const finished = false;
+  const errors = [];
+  const pageReadValue = pageRead ? parseInt(pageRead, 10): 0;
+  // let bookExists = false;
+
+  pool.query(
+      `SELECT * FROM books
+    WHERE email = $1`,
+      [email], (err, result) => {
+        if (err) {
+          console.log('Error selecting books: ', err);
+          return res.status(500).send('Internal Server error');
+        }
+
+        const books = result.rows;
+
+        books.forEach((book) => {
+          if (title === book.title) {
+            errors.push({message: 'You already have that book!'});
+          }
+        });
+
+        if (pageCount < pageReadValue) {
+          errors.push({message: 'Page Read cannot be greater than Page!'});
+        }
+
+        if (year < 1900) {
+          errors.push({message: 'Your book is too old'});
+        }
+
+        if (errors.length > 0) {
+          res.render('dashboard', {errors, user: user, books: books});
+        } else {
+          if (pageReadValue > 0) {
+            reading = true;
+          }
+
+          if (pageCount === pageReadValue) {
+            finished = true;
+          }
+          pool.query(
+              `INSERT INTO books(title, year, summary, publisher, page_count,
+    page_read, reading, finished, inserted_at, email)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+              [title, year, summary, publisher, pageCount,
+                pageReadValue, reading, finished, insertedAt, email],
+              (err, result) => {
+                if (err) {
+                  throw err;
+                }
+                console.log(result.rows);
+                req.flash('success_msg', 'Your new book is now on the list');
+                res.redirect('/users');
+              },
+          );
+        }
+      },
+
+  );
+};
+
 const postLogin = passport.authenticate('local', {
   successRedirect: '/users',
   failureRedirect: '/login',
@@ -117,4 +184,5 @@ module.exports = {
   postReg,
   postLogin,
   logOutPage,
+  postBook,
 };

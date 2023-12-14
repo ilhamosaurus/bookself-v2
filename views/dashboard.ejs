@@ -5,13 +5,95 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.css">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <style>
+    /* Add this style in the head or inline */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 100%;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
   <title>Dashboard</title>
 </head>
 <body>
   <a href="/logout">Logout</a>
   <h1>Hello <%= user.charAt(0).toUpperCase() + user.slice(1) %></h1>
+  <ul>
+    <% if (messages.success_msg) { %>
+    <li><%= messages.success_msg %></li>
+  <% } %>
+  </ul>
+  <ul>
+    <% if (typeof errors !== 'undefined') { %>
+      <% errors.forEach(error => { %>
+        <li><%= error.message %></li>
+      <% }) %>
+    <% } %>
+    </ul>
   <% if (books && books.length > 0) { %>
     <h2>Your Books:</h2>
+    <button onclick="openModal()">Add a Book</button>
+    <div id="addBookModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <!-- Your form for adding a book goes here -->
+      <form id="addBookForm" action="/add-book" method="POST">
+      <!-- Title -->
+      <label for="title">Title <span style="color: red;">*</span>:</label>
+      <input type="text" id="title" name="title" placeholder="Title" required><br>
+
+      <!-- Year -->
+      <label for="year">Year <span style="color: red;">*</span>:</label>
+      <input type="number" id="year" name="year" placeholder="Year" required><br>
+
+      <!-- Summary -->
+      <label for="summary">Summary <span style="color: red;">*</span>:</label>
+      <input type="text" id="summary" name="summary" placeholder="Summary" required><br>
+
+      <!-- Publisher -->
+      <label for="publisher">Publisher <span style="color: red;">*</span>:</label>
+      <input type="text" id="publisher" name="publisher" placeholder="Publisher" required><br>
+
+      <!-- Page Count -->
+      <label for="pageCount">Page Count <span style="color: red;">*</span>:</label>
+      <input type="number" id="pageCount" name="pageCount" placeholder="Page Count" required><br>
+
+      <!-- Page Read -->
+      <label for="pageRead">Page Read:</label>
+      <input type="number" id="pageRead" name="pageRead" placeholder="Page Read"><br>
+
+        <!-- Add more input fields as needed -->
+
+        <button type="submit">Add Book</button>
+      </form>
+    </div>
+  </div>
     <table>
       <thead>
         <tr>
@@ -43,5 +125,22 @@
   <% } else { %>
     <p>No books found.</p>
   <% } %>
+  <script>
+    // JavaScript for handling modal interactions
+    function openModal() {
+      document.getElementById('addBookModal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('addBookModal').style.display = 'none';
+    }
+
+    // Close the modal if the user clicks outside of it
+    window.onclick = function (event) {
+      if (event.target == document.getElementById('addBookModal')) {
+        closeModal();
+      }
+    };
+  </script>
 </body>
 </html>

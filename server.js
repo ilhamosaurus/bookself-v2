@@ -23,6 +23,7 @@ app.use(passport.initialize());
 app.set('view engine', 'ejs');
 
 app.use(route);
+app.use('/add-book', route);
 
 const listener = app.listen(process.env.PORT || 3000, async () => {
   console.log(`Server is running on port ${listener.address().port}`);
