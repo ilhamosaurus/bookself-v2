@@ -2,3 +2,6 @@ node_modules
 .env
 .vscode
 .eslintrc.json
+books (1).sql
+books.sql
+books (2).sql

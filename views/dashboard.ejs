@@ -10,5 +10,38 @@
 <body>
   <a href="/logout">Logout</a>
   <h1>Hello <%= user.charAt(0).toUpperCase() + user.slice(1) %></h1>
+  <% if (books && books.length > 0) { %>
+    <h2>Your Books:</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Year</th>
+          <th>Summary</th>
+          <th>Publisher</th>
+          <th>Page</th>
+          <th>Page Read</th>
+          <th>Update</th>
+          <!-- Add more headers if needed -->
+        </tr>
+      </thead>
+      <tbody>
+        <% books.forEach(book => { %>
+          <tr>
+            <td><%= book.title %></td>
+            <td><%= book.year %></td>
+            <td><%= book.summary %></td>
+            <td><%= book.publisher %></td>
+            <td><%= book.page_count %></td>
+            <td><%= book.page_read %></td>
+            <td><%= book.updated_at %></td>
+            <!-- Add more columns if needed -->
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } else { %>
+    <p>No books found.</p>
+  <% } %>
 </body>
 </html>

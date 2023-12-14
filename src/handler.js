@@ -16,11 +16,25 @@ const regisPage = (req, res) => {
 
 const dashPage = (req, res) => {
   if (req.user && req.user.name) {
-    res.render('dashboard', {user: req.user.name});
+    const email = req.user.email;
+
+    pool.query(
+        `SELECT * FROM books WHERE email = $1`, [email],
+        (err, result) => {
+          if (err) {
+            throw err;
+          }
+
+          const books = result.rows;
+
+          res.render('dashboard', {user: req.user.name, books: books});
+        },
+    );
   } else {
     res.status(500).send('User data is missing or incomplete');
   }
 };
+
 
 const logOutPage = (req, res) => {
   req.logOut((err) => {
@@ -102,4 +116,5 @@ module.exports = {
   dashPage,
   postReg,
   postLogin,
-  logOutPage};
+  logOutPage,
+};
