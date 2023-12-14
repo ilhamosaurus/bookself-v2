@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const {pool} = require('./db-config');
+const passport = require('passport');
 
 const homePage = (req, res) => {
   res.render('index');
@@ -14,7 +15,21 @@ const regisPage = (req, res) => {
 };
 
 const dashPage = (req, res) => {
-  res.render('dashboard');
+  if (req.user && req.user.name) {
+    res.render('dashboard', {user: req.user.name});
+  } else {
+    res.status(500).send('User data is missing or incomplete');
+  }
+};
+
+const logOutPage = (req, res) => {
+  req.logOut((err) => {
+    if (err) {
+      return next(err); // Handle error if it occurs during logout
+    }
+    req.flash('success_msg', 'You have logged out');
+    res.redirect('/login');
+  });
 };
 
 const postReg = async (req, res) => {
@@ -74,4 +89,17 @@ const postReg = async (req, res) => {
   }
 };
 
-module.exports = {homePage, loginPage, regisPage, dashPage, postReg};
+const postLogin = passport.authenticate('local', {
+  successRedirect: '/users',
+  failureRedirect: '/login',
+  failureFlash: true,
+});
+
+module.exports = {
+  homePage,
+  loginPage,
+  regisPage,
+  dashPage,
+  postReg,
+  postLogin,
+  logOutPage};

@@ -1,15 +1,40 @@
-const express = require("express");
-const { homePage, loginPage, regisPage, dashPage, postReg } = require("./handler");
+const express = require('express');
+const {
+  homePage,
+  loginPage,
+  regisPage,
+  dashPage,
+  postReg,
+  postLogin,
+  logOutPage} =
+  require('./handler');
+// eslint-disable-next-line new-cap
 const route = express.Router();
+const checkAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return res.redirect('/users');
+  }
+  next();
+};
+const checkNotAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/login');
+};
 
-route.get("/", homePage);
+route.get('/', checkAuthenticated, homePage);
 
-route.get("/login", loginPage);
+route.get('/login', checkAuthenticated, loginPage);
 
-route.get("/register", regisPage);
+route.get('/register', checkAuthenticated, regisPage);
 
-route.get("/users", dashPage);
+route.get('/users', checkNotAuthenticated, dashPage);
 
-route.post("/register", postReg);
+route.get('/logout', logOutPage);
+
+route.post('/register', postReg);
+
+route.post('/login', postLogin);
 
 module.exports = route;
