@@ -56,8 +56,6 @@
       <% }) %>
     <% } %>
     </ul>
-  <% if (books && books.length > 0) { %>
-    <h2>Your Books:</h2>
     <button onclick="openModal()">Add a Book</button>
     <div id="addBookModal" class="modal">
     <div class="modal-content">
@@ -94,6 +92,8 @@
       </form>
     </div>
   </div>
+  <% if (books && books.length > 0) { %>
+    <h2>Your Books:</h2>
     <table>
       <thead>
         <tr>
@@ -110,7 +110,7 @@
       <tbody>
         <% books.forEach(book => { %>
           <tr>
-            <td><%= book.title %></td>
+            <td><a href="/book/<%= book.book_id %>"><%= book.title %></a></td>
             <td><%= book.year %></td>
             <td><%= book.summary %></td>
             <td><%= book.publisher %></td>

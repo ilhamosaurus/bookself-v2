@@ -7,7 +7,8 @@ const {
   postReg,
   postLogin,
   logOutPage,
-  postBook} =
+  postBook,
+  getBookById} =
   require('./handler');
 // eslint-disable-next-line new-cap
 const route = express.Router();
@@ -39,5 +40,7 @@ route.post('/register', postReg);
 route.post('/login', postLogin);
 
 route.post('/add-book', checkNotAuthenticated, postBook);
+
+route.get('/book/:id', checkNotAuthenticated, getBookById);
 
 module.exports = route;

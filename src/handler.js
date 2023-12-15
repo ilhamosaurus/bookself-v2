@@ -35,6 +35,29 @@ const dashPage = (req, res) => {
   }
 };
 
+const getBookById = (req, res) => {
+  if (req.params.id) {
+    const bookId = req.params.id;
+
+    pool.query(
+        `SELECT * FROM books
+      WHERE book_id = $1`, [bookId],
+        (err, result) => {
+          if (err) {
+            throw err;
+          }
+
+          const books = result.rows;
+
+          books.forEach((book)=> {
+            res.render('details', {book});
+          });
+        },
+    );
+  } else {
+    res.status(500).send('User data is missingor incomplete');
+  }
+};
 
 const logOutPage = (req, res) => {
   req.logOut((err) => {
@@ -185,4 +208,5 @@ module.exports = {
   postLogin,
   logOutPage,
   postBook,
+  getBookById,
 };
