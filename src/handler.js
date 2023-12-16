@@ -55,7 +55,7 @@ const getBookById = (req, res) => {
         },
     );
   } else {
-    res.status(500).send('User data is missingor incomplete');
+    res.status(500).send('User data is missing or incomplete');
   }
 };
 
@@ -199,6 +199,68 @@ const postLogin = passport.authenticate('local', {
   failureFlash: true,
 });
 
+const editBook = async (req, res) => {
+  const bookId = req.params.id;
+  const {title, year, summary, publisher, pageCount, pageRead} = req.body;
+  let reading = false;
+  let finished = false;
+  const updatedAt = new Date().toISOString();
+  const pageCountValue = parseInt(pageCount, 10);
+  const pageReadValue = pageRead ? parseInt(pageRead, 10) : 0;
+  const errors = [];
+
+  try {
+    const result = await pool.query(
+        `SELECT * FROM books
+      WHERE book_id = $1`,
+        [bookId],
+    );
+
+    const books = result.rows;
+
+    if (pageCountValue < pageReadValue) {
+      errors.push({message: 'Page read cannot be greater than page count'});
+    }
+
+    if (year < 1900) {
+      errors.push({message: 'Your book is too old'});
+    }
+
+    if (errors.length > 0) {
+      res.render('details', {errors, book: books});
+    } else {
+      if (pageReadValue > 0) {
+        reading = true;
+      }
+
+      if (pageCountValue === pageReadValue) {
+        finished = true;
+      }
+
+      const updateResult = await pool.query(
+          `UPDATE books
+          SET title = $1, year = $2,
+          summary = $3, publisher = $4, 
+          page_count = $5, page_read = $6,
+          reading = $7, finished = $8,
+          updated_at = $9
+          WHERE book_id = $10
+          RETURNING *`,
+          [title, year, summary, publisher, pageCount, pageReadValue,
+            reading, finished, updatedAt, bookId],
+      );
+
+      const updatedBook = updateResult.rows[0];
+      console.log(updatedBook);
+      req.flash('success_msg', 'You updated the book.');
+      res.redirect(`/book/${bookId}`);
+    }
+  } catch (error) {
+    console.error('Error updating book:', error);
+    res.status(500).json({error: 'Internal Server Error'});
+  }
+};
+
 module.exports = {
   homePage,
   loginPage,
@@ -209,4 +271,5 @@ module.exports = {
   logOutPage,
   postBook,
   getBookById,
+  editBook,
 };
