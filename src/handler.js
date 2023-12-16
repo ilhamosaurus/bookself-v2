@@ -261,6 +261,28 @@ const editBook = async (req, res) => {
   }
 };
 
+const deleteBookById = (req, res) => {
+  const bookId = req.params.id;
+
+  pool.query(
+      `DELETE FROM books
+        WHERE book_id = $1
+        RETURNING *`,
+      [bookId],
+      (err, result) => {
+        if (err) {
+          console.error('Error deleting book:', err);
+          res.status(500).json({error: 'Internal Server Error'});
+          return;
+        }
+
+        console.log(result.rows);
+        req.flash('success_msg', 'You delete a book');
+        res.sendStatus(204); // Status 204 indicates success with no content
+      },
+  );
+};
+
 module.exports = {
   homePage,
   loginPage,
@@ -272,4 +294,5 @@ module.exports = {
   postBook,
   getBookById,
   editBook,
+  deleteBookById,
 };

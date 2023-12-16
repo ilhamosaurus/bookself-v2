@@ -146,10 +146,40 @@
   </div>
 
     <!-- Delete Button -->
-    <form action="/book/<%= book.book_id %>/delete" method="delete" onsubmit="return confirm('Are you sure you want to delete this book?')">
-        <button type="submit">Delete</button>
+    <form id="deleteBookForm" action="/book/<%= book.book_id %>/delete" method="post">
+        <input type="hidden" name="_method" value="DELETE">
+        <button type="button" onclick="confirmDelete()">Delete</button>
     </form>
 
+    <script>
+        async function confirmDelete() {
+            if (confirm('Are you sure you want to delete this book?')) {
+                const form = document.getElementById('deleteBookForm');
+                const formData = new FormData(form);
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams(formData).toString(),
+                    });
+
+                    if (response.ok) {
+                        // Handle successful deletion
+                        console.log('Book deleted successfully');
+                        window.location.href = '/users'; // Redirect to /users after successful deletion
+                    } else {
+                        // Handle deletion error
+                        console.error('Error deleting book. Status:', response.status);
+                    }
+                } catch (error) {
+                    console.error('Error deleting book:', error);
+                }
+            }
+        }
+    </script>
     <a href="/users">Back to Dashboard</a>
     <footer>If it's not redirect you after update a book please reload the page!</footer>
   <script>
